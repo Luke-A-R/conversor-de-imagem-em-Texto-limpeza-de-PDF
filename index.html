@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas Araujo Ramos - Conversor de Imagem em Texto</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho com Logo -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="Logo.png" alt="Logo" class="logo">
+            </div>
+            <h1>Conversor de Imagem em Texto <br> Limpeza de PDF</h1>
+        </header>
+
+        <!-- Seção de Upload -->
+        <section class="upload-section">
+            <div class="upload-buttons">
+                <input type="file" id="imageInput" accept="image/*" class="visually-hidden">
+                <label for="imageInput" class="upload-label">Carregar Imagem</label>
+                
+                <input type="file" id="pdfInput" accept="application/pdf" class="visually-hidden">
+                <label for="pdfInput" class="upload-label pdf-button">Carregar PDF</label>
+                
+                <div id="pdfProcessingMessage" class="hidden processing-message">
+                    <div class="progress-bar">
+                        <div id="pdfProgress" class="progress-bar-fill">0%</div>
+                    </div>
+                    <p>Processando PDF, por favor aguarde...</p>
+                </div>
+            </div>
+
+            <div id="dropArea" class="drop-area">
+                <p>Arraste e solte uma imagem aqui</p>
+            </div>
+            
+            <div id="pasteArea" class="paste-area">
+                <p>Ou cole uma imagem (Ctrl + V)</p>
+            </div>
+        </section>
+
+        <!-- Visualização da Imagem/PDF -->
+        <section class="preview-section">
+            <div id="imagePreviewContainer" class="preview-container hidden">
+                <h3>Pré-visualização:</h3>
+                <img id="imagePreview" src="#" alt="Pré-visualização da imagem">
+            </div>
+            
+            <div id="pdfPreviewContainer" class="preview-container hidden">
+                <h3>Visualização do PDF:</h3>
+                <iframe id="pdfPreview" frameborder="0"></iframe>
+            </div>
+        </section>
+
+        <!-- Configurações -->
+        <section class="settings">
+            <div class="language-selector">
+                <label for="language">Idioma:</label>
+                <select id="language">
+                    <option value="por">Português</option>
+                    <option value="eng">Inglês</option>
+                    <option value="spa">Espanhol</option>
+                    <option value="fra">Francês</option>
+                </select>
+            </div>
+
+            <div class="clean-options">
+                <label for="cleanMode">Modo de Limpeza:</label>
+                <select id="cleanMode">
+                    <option value="basic">Básica (Rápida)</option>
+                    <option value="deep">Profunda (Remove mais vestígios)</option>
+                    <option value="render">Nuclear (Renderiza como imagem)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Ações Principais -->
+        <section class="actions">
+            <button id="cleanPdfButton" class="btn-clean">Limpar e Baixar PDF</button>
+            <button id="extractButton" class="btn-extract">Extrair Texto</button>
+        </section>
+
+        <!-- Resultados -->
+        <section class="results">
+            <h2>Texto Extraído:</h2>
+            <div class="text-container">
+                <pre id="output"></pre>
+                <button id="copyButton" class="btn-copy hidden">Copiar Texto</button>
+            </div>
+            <button id="toggleDetailsButton" class="btn-details hidden">Mostrar Detalhes</button>
+            <div id="confidenceDetails" class="hidden"></div>
+        </section>
+    </div>
+
+    <!-- Bibliotecas JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
