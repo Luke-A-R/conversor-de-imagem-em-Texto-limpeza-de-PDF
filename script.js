@@ -1,10 +1,8 @@
 let uploadedFile = null;
 let uploadedPdf = null;
 
-// Configuração do PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
 
-// Elementos DOM
 const elements = {
     imageInput: document.getElementById('imageInput'),
     pdfInput: document.getElementById('pdfInput'),
@@ -29,7 +27,6 @@ const elements = {
     pdfPreview: document.getElementById('pdfPreview')
 };
 
-// Event Listeners
 elements.imageInput.addEventListener('change', handleImageUpload);
 elements.pdfInput.addEventListener('change', handlePdfUpload);
 elements.cleanPdfButton.addEventListener('click', cleanAndDownloadPdf);
@@ -37,7 +34,6 @@ elements.extractButton.addEventListener('click', extractText);
 elements.copyButton.addEventListener('click', copyText);
 elements.toggleDetailsButton.addEventListener('click', toggleDetails);
 
-// Configuração de arrastar e soltar
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     elements.dropArea.addEventListener(eventName, preventDefaults, false);
     elements.pasteArea.addEventListener(eventName, preventDefaults, false);
@@ -56,16 +52,13 @@ elements.toggleDetailsButton.addEventListener('click', toggleDetails);
 elements.dropArea.addEventListener('drop', handleDrop, false);
 document.addEventListener('paste', handlePaste);
 
-// Funções principais
 function handleImageUpload(event) {
     uploadedFile = event.target.files[0];
     uploadedPdf = null;
     
     if (uploadedFile) {
-        // Mostrar pré-visualização da imagem
         elements.pdfPreviewContainer.classList.add('hidden');
         elements.imagePreviewContainer.classList.remove('hidden');
-        
         const reader = new FileReader();
         reader.onload = function(e) {
             elements.imagePreview.src = e.target.result;
@@ -79,10 +72,8 @@ function handlePdfUpload(event) {
     uploadedFile = null;
     
     if (uploadedPdf) {
-        // Mostrar visualização do PDF
         elements.imagePreviewContainer.classList.add('hidden');
         elements.pdfPreviewContainer.classList.remove('hidden');
-        
         const blobUrl = URL.createObjectURL(uploadedPdf);
         elements.pdfPreview.src = blobUrl;
     }
@@ -95,12 +86,10 @@ async function cleanAndDownloadPdf() {
     }
 
     try {
-        // Configuração do estado inicial
         elements.cleanPdfButton.disabled = true;
         elements.pdfProcessingMessage.classList.remove('hidden');
         updateProgress(10);
 
-        // Verificar se é um PDF válido
         if (uploadedPdf.type !== 'application/pdf') {
             throw new Error('O arquivo não é um PDF válido');
         }
@@ -109,11 +98,9 @@ async function cleanAndDownloadPdf() {
         const arrayBuffer = await readFileAsArrayBuffer(uploadedPdf);
         updateProgress(30);
 
-        // Obter o modo de limpeza selecionado
         const cleanMode = elements.cleanMode.value;
         let cleanedPdfBytes;
 
-        // Executar o modo de limpeza selecionado
         switch(cleanMode) {
             case 'basic':
                 cleanedPdfBytes = await basicCleanPdf(arrayBuffer);
@@ -130,7 +117,6 @@ async function cleanAndDownloadPdf() {
 
         updateProgress(80);
 
-        // Criar e baixar o PDF limpo
         const blob = new Blob([cleanedPdfBytes], { type: 'application/pdf' });
         const fileName = `documento_limpo_${cleanMode}.pdf`;
         saveAs(blob, fileName);
@@ -145,11 +131,9 @@ async function cleanAndDownloadPdf() {
     }
 }
 
-// Funções de limpeza de PDF
 async function basicCleanPdf(arrayBuffer) {
     const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
     
-    // Remover metadados básicos
     pdfDoc.setTitle('Documento Limpo');
     pdfDoc.setAuthor('');
     pdfDoc.setSubject('');
@@ -168,18 +152,14 @@ async function basicCleanPdf(arrayBuffer) {
 }
 
 async function deepCleanPdf(arrayBuffer) {
-    // Primeiro fazer uma limpeza básica
     const basicCleaned = await basicCleanPdf(arrayBuffer);
     
-    // Carregar novamente para limpeza profunda
     const pdfDoc = await PDFLib.PDFDocument.load(basicCleaned);
     
-    // Remover assinaturas digitais e campos de formulário
     if (pdfDoc.catalog.get(PDFLib.Name.of('AcroForm'))) {
         pdfDoc.catalog.delete(PDFLib.Name.of('AcroForm'));
     }
     
-    // Remover anotações e ações
     const pages = pdfDoc.getPages();
     for (const page of pages) {
         try {
@@ -196,20 +176,17 @@ async function deepCleanPdf(arrayBuffer) {
 }
 
 async function renderCleanPdf(pdfFile) {
-    // Carregar o PDF com pdf.js
     const loadingTask = pdfjsLib.getDocument(await pdfFile.arrayBuffer());
     const pdf = await loadingTask.promise;
     const { PDFDocument } = PDFLib;
     const newPdfDoc = await PDFDocument.create();
     
-    // Processar cada página
     for (let i = 1; i <= pdf.numPages; i++) {
         updateProgress(30 + (i * 50 / pdf.numPages));
         
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: 2.0 });
         
-        // Renderizar página como imagem
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
@@ -220,7 +197,6 @@ async function renderCleanPdf(pdfFile) {
             viewport: viewport
         }).promise;
         
-        // Converter para imagem e adicionar ao novo PDF
         const image = await newPdfDoc.embedPng(canvas.toDataURL('image/png'));
         const newPage = newPdfDoc.addPage([image.width, image.height]);
         newPage.drawImage(image, {
@@ -231,14 +207,12 @@ async function renderCleanPdf(pdfFile) {
         });
     }
     
-    // Remover metadados
     newPdfDoc.setTitle('Documento Renderizado');
     newPdfDoc.setAuthor('');
     
     return await newPdfDoc.save();
 }
 
-// Funções auxiliares
 function loadImage(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -266,7 +240,6 @@ function updateProgress(percent) {
     elements.pdfProgress.textContent = `${percent}%`;
 }
 
-// Funções para arrastar e soltar
 function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -327,7 +300,6 @@ function handlePaste(e) {
         }
     }
 }
-// Funções para extração de texto
 function extractText() {
     if (!uploadedFile && !uploadedPdf) {
         alert('Por favor, carregue uma imagem ou PDF.');
