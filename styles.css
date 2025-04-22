@@ -1,127 +1,178 @@
-body {
+/* ===== VARIÁVEIS E ESTILOS GERAIS ===== */
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --secondary-color: #ff5722;
+    --secondary-hover: #e64a19;
+    --success-color: #28a745;
+    --success-hover: #218838;
+    --gray-color: #6c757d;
+    --gray-hover: #5a6268;
+    --light-gray: #f4f4f9;
+    --white: #fff;
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: var(--light-gray);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-}
-
-.container {
-    background-color: #fff;
+  }
+  
+  /* ===== LAYOUT PRINCIPAL ===== */
+  .container {
+    position: relative;
+    background-color: var(--white);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     max-width: 800px;
     width: 90%;
     margin: 20px auto;
-}
-
-.logo-container {
+  }
+  
+  /* ===== CABEÇALHO ===== */
+  .header {
+    margin-top: 50px;
+  }
+  
+  .logo-container {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.logo {
+  }
+  
+  .logo {
     max-width: 150px;
     height: auto;
-}
-
-h1 {
+  }
+  
+  h1 {
     text-align: center;
     color: #333;
     margin-bottom: 20px;
-}
-
-.upload-section {
+  }
+  
+  /* ===== SEÇÃO DE UPLOAD ===== */
+  .upload-section {
     margin-bottom: 20px;
-}
-
-.upload-buttons {
+  }
+  
+  .upload-buttons {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
     flex-wrap: wrap;
-}
-
-.upload-label {
+  }
+  
+  .upload-label {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: var(--white);
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 10px;
     text-align: center;
     flex-grow: 1;
-}
-
-.upload-label:hover {
-    background-color: #0056b3;
-}
-
-.pdf-button {
-    background-color: #ff5722;
-}
-
-.pdf-button:hover {
-    background-color: #e64a19;
-}
-
-#imageInput, #pdfInput {
-    display: none;
-}
-
-.drop-area, .paste-area {
-    border: 2px dashed #007bff;
+    transition: background-color 0.3s;
+  }
+  
+  .upload-label:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  .pdf-button {
+    background-color: var(--secondary-color);
+  }
+  
+  .pdf-button:hover {
+    background-color: var(--secondary-hover);
+  }
+  
+  .drop-area, .paste-area {
+    border: 2px dashed var(--primary-color);
     border-radius: 5px;
     padding: 20px;
     text-align: center;
-    color: #007bff;
+    color: var(--primary-color);
     cursor: pointer;
     margin-bottom: 10px;
     transition: all 0.3s;
-}
-
-.drop-area.dragover, .paste-area.dragover {
+  }
+  
+  .drop-area.dragover, .paste-area.dragover {
     background-color: #e3f2fd;
-    border-color: #0056b3;
-}
-
-.image-preview {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#preview {
-    max-width: 100%;
-    height: auto;
+    border-color: var(--primary-hover);
+  }
+  
+  /* ===== PRÉ-VISUALIZAÇÃO ===== */
+  .preview-section {
+    margin: 20px 0;
+    border: 1px solid #eee;
+    padding: 15px;
     border-radius: 5px;
-    display: none;
+  }
+  
+  .preview-container {
+    text-align: center;
     margin: 0 auto;
-}
-
-.language-selector, .clean-options {
+  }
+  
+  .preview-container h3 {
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  #imagePreview {
+    max-width: 100%;
+    max-height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  #pdfPreview {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  /* ===== CONFIGURAÇÕES ===== */
+  .settings {
     margin-bottom: 20px;
+  }
+  
+  .language-selector, .clean-options {
     padding: 10px;
     background: #f5f5f5;
     border-radius: 5px;
-}
-
-.language-selector label, .clean-options label {
+    margin-bottom: 15px;
+  }
+  
+  .language-selector label, .clean-options label {
     margin-right: 10px;
     font-weight: bold;
-}
-
-select {
+  }
+  
+  select {
     padding: 5px;
     border-radius: 4px;
     border: 1px solid #ddd;
-}
-
-button {
+  }
+  
+  /* ===== BOTÕES PRINCIPAIS ===== */
+  .btn-clean, .btn-extract {
     display: block;
     width: 100%;
     padding: 10px;
@@ -131,41 +182,41 @@ button {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-}
-
-#cleanPdfButton {
-    background-color: #ff5722;
-    color: white;
-}
-
-#cleanPdfButton:hover:not(:disabled) {
-    background-color: #e64a19;
-}
-
-#cleanPdfButton:disabled {
+    color: var(--white);
+  }
+  
+  .btn-clean {
+    background-color: var(--secondary-color);
+  }
+  
+  .btn-clean:hover:not(:disabled) {
+    background-color: var(--secondary-hover);
+  }
+  
+  .btn-clean:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-}
-
-#extractButton {
-    background-color: #28a745;
-    color: white;
-}
-
-#extractButton:hover {
-    background-color: #218838;
-}
-
-.results {
+  }
+  
+  .btn-extract {
+    background-color: var(--success-color);
+  }
+  
+  .btn-extract:hover {
+    background-color: var(--success-hover);
+  }
+  
+  /* ===== RESULTADOS ===== */
+  .results {
     margin-top: 20px;
-}
-
-.text-container {
+  }
+  
+  .text-container {
     position: relative;
     margin-bottom: 10px;
-}
-
-#output {
+  }
+  
+  #output {
     background-color: #f8f9fa;
     padding: 15px;
     border-radius: 5px;
@@ -174,65 +225,64 @@ button {
     max-height: 300px;
     overflow-y: auto;
     font-family: monospace;
-}
-
-#copyButton {
+  }
+  
+  .btn-copy, .btn-details {
+    background-color: var(--gray-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-copy {
     position: absolute;
     top: 5px;
     right: 5px;
     padding: 5px 10px;
-    background-color: #6c757d;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
     width: auto;
-}
-
-#copyButton:hover {
-    background-color: #5a6268;
-}
-
-#toggleDetailsButton {
-    background-color: #6c757d;
-    color: white;
+  }
+  
+  .btn-copy:hover {
+    background-color: var(--gray-hover);
+  }
+  
+  .btn-details {
     width: auto;
     margin: 10px auto;
     padding: 8px 15px;
-}
-
-#toggleDetailsButton:hover {
-    background-color: #5a6268;
-}
-
-#confidenceDetails {
+  }
+  
+  .btn-details:hover {
+    background-color: var(--gray-hover);
+  }
+  
+  #confidenceDetails {
     background-color: #f8f9fa;
     padding: 15px;
     border-radius: 5px;
     margin-top: 10px;
     display: none;
-}
-
-.hidden {
-    display: none;
-}
-
-.processing-message {
-    color: #ff5722;
+  }
+  
+  /* ===== PROCESSAMENTO ===== */
+  .processing-message {
+    color: var(--secondary-color);
     font-weight: bold;
     margin: 10px 0;
     text-align: center;
-}
-
-.progress-bar {
+  }
+  
+  .progress-bar {
     width: 100%;
     background-color: #f3f3f3;
     border-radius: 5px;
     margin: 10px 0;
     overflow: hidden;
-}
-
-.progress-bar-fill {
+  }
+  
+  .progress-bar-fill {
     height: 20px;
     background-color: #4CAF50;
     border-radius: 5px;
@@ -242,66 +292,96 @@ button {
     color: white;
     transition: width 0.3s;
     font-size: 12px;
-}
-
-.pdf-preview {
-    text-align: center;
+  }
+  
+  /* ===== AJUDA ===== */
+  .help-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .help-button:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.1);
+  }
+  
+  .help-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+  }
+  
+  .help-modal-content {
+    background-color: var(--white);
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 700px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+  
+  .help-close-button {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .help-close-button:hover {
+    color: #333;
+  }
+  
+  .help-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .help-content h3 {
+    color: var(--primary-color);
     margin-top: 20px;
-}
-
-#pdfViewer {
-    width: 100%;
-    height: 400px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-}
-
-@media (max-width: 600px) {
-    .upload-buttons {
-        flex-direction: column;
-    }
-    
-    .container {
-        padding: 15px;
-        width: 95%;
-    }
-}
-
-/* Seção de Pré-visualização */
-.preview-section {
-    margin: 20px 0;
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.preview-container {
-    text-align: center;
-    margin: 0 auto;
-}
-
-.preview-container h3 {
-    margin-bottom: 10px;
-    color: #555;
-}
-
-#imagePreview {
-    max-width: 100%;
-    max-height: 300px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin: 0 auto;
-    display: block;
-}
-
-#pdfPreview {
-    width: 100%;
-    height: 400px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.visually-hidden {
+  }
+  
+  .help-content ol, .help-content ul {
+    padding-left: 20px;
+  }
+  
+  .help-content li {
+    margin-bottom: 8px;
+  }
+  
+  /* ===== UTILITÁRIOS ===== */
+  .hidden {
+    display: none;
+  }
+  
+  .visually-hidden {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -310,4 +390,29 @@ button {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
-}
+  }
+  
+  /* ===== RESPONSIVIDADE ===== */
+  @media (max-width: 768px) {
+    .help-modal-content {
+      width: 90%;
+      margin: 10% auto;
+    }
+    
+    .help-button {
+      width: 35px;
+      height: 35px;
+      font-size: 18px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .upload-buttons {
+      flex-direction: column;
+    }
+    
+    .container {
+      padding: 15px;
+      width: 95%;
+    }
+  }
