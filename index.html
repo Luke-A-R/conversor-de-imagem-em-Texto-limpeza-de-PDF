@@ -8,7 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <!-- Cabeçalho com Logo -->
+        <!-- Botão de Ajuda -->
+        <button id="helpButton" class="help-button">?</button>
+
+        <!-- Cabeçalho -->
         <header class="header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" class="logo">
@@ -42,7 +45,7 @@
             </div>
         </section>
 
-        <!-- Visualização da Imagem/PDF -->
+        <!-- Visualização -->
         <section class="preview-section">
             <div id="imagePreviewContainer" class="preview-container hidden">
                 <h3>Pré-visualização:</h3>
@@ -75,7 +78,7 @@
             </div>
         </section>
 
-        <!-- Ações Principais -->
+        <!-- Ações -->
         <section class="actions">
             <button id="cleanPdfButton" class="btn-clean">Limpar e Baixar PDF</button>
             <button id="extractButton" class="btn-extract">Extrair Texto</button>
@@ -91,6 +94,39 @@
             <button id="toggleDetailsButton" class="btn-details hidden">Mostrar Detalhes</button>
             <div id="confidenceDetails" class="hidden"></div>
         </section>
+    </div>
+
+    <!-- Modal de Ajuda -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <span class="help-close-button">&times;</span>
+            <h2>Ajuda - Conversor de Imagem em Texto <br> Limpeza Para Tarjamento</h2>
+            <div class="help-content">
+                <h3>Como usar:</h3>
+                <ol>
+                    <li><strong>Carregar Imagem/PDF:</strong> Use os botões ou arraste e solte o arquivo na área indicada.</li>
+                    <li><strong>Configurações:</strong> Selecione o idioma do texto na imagem caso necessario e o modo de limpeza (para PDFs).</li>
+                    <li><strong>Ações:</strong>
+                        <ul>
+                            <li>"Limpar e Baixar PDF" - Remove metadados e otimiza o PDF Para tarjamento sem Bug</li>
+                            <li>"Extrair Texto" - Converte o texto da imagem em texto editável podendo copiar</li>
+                        </ul>
+                    </li>
+                    <li><strong>Resultados:</strong> O texto extraído aparecerá na área abaixo, com opção de copiar.</li>
+                </ol>
+                
+                <h3>Recursos:</h3>
+                <ul>
+                    <li>Suporte a múltiplos idiomas</li>
+                    <li>Pré-visualização de imagens e PDFs</li>
+                    <li>Opção de colar imagem diretamente (Ctrl+V)</li>
+                    <li>Detalhes de confiança na extração de texto</li>
+                </ul>
+                
+                <h3>Formatos suportados:</h3>
+                <p>Imagens: JPG, PNG, BMP | Documentos: PDF</p>
+            </div>
+        </div>
     </div>
 
     <!-- Bibliotecas JavaScript -->
