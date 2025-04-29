@@ -1,55 +1,231 @@
+// =============================================
+// VARIÁVEIS GLOBAIS E CONFIGURAÇÃO INICIAL
+// =============================================
+
 // Variáveis globais
 let uploadedFile = null;
 let uploadedPdf = null;
+let uploadedAudio = null;
+let audioBlob = null;
 
-// Configuração inicial
+// Configuração do PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
 
-// Elementos DOM
+// =============================================
+// ELEMENTOS DOM
+// =============================================
+
 const elements = {
+    // Inputs
     imageInput: document.getElementById('imageInput'),
     pdfInput: document.getElementById('pdfInput'),
+    audioInput: document.getElementById('audioInput'),
+    
+    // Previews
     preview: document.getElementById('preview'),
     pdfPreview: document.getElementById('pdfPreview'),
+    imagePreviewContainer: document.getElementById('imagePreviewContainer'),
+    imagePreview: document.getElementById('imagePreview'),
+    pdfPreviewContainer: document.getElementById('pdfPreviewContainer'),
+    audioPreviewContainer: document.getElementById('audioPreviewContainer'),
+    audioPreview: document.getElementById('audioPreview'),
+    
+    // Informações de arquivo
+    audioFileName: document.getElementById('audioFileName'),
+    audioFileSize: document.getElementById('audioFileSize'),
+    audioDuration: document.getElementById('audioDuration'),
+    
+    // Processamento de PDF
     cleanPdfButton: document.getElementById('cleanPdfButton'),
     cleanMode: document.getElementById('cleanMode'),
     pdfProcessingMessage: document.getElementById('pdfProcessingMessage'),
     pdfProgress: document.getElementById('pdfProgress'),
+    
+    // Áreas de drag and drop
     dropArea: document.getElementById('dropArea'),
     pasteArea: document.getElementById('pasteArea'),
+    
+    // Extração de texto
     extractButton: document.getElementById('extractButton'),
     output: document.getElementById('output'),
     copyButton: document.getElementById('copyButton'),
     toggleDetailsButton: document.getElementById('toggleDetailsButton'),
     confidenceDetails: document.getElementById('confidenceDetails'),
     language: document.getElementById('language'),
-    imagePreviewContainer: document.getElementById('imagePreviewContainer'),
-    imagePreview: document.getElementById('imagePreview'),
-    pdfPreviewContainer: document.getElementById('pdfPreviewContainer'),
+    
+    // Conversão de áudio
+    convertButton: document.getElementById('convertButton'),
+    audioResultContainer: document.getElementById('audioResultContainer'),
+    convertedAudio: document.getElementById('convertedAudio'),
+    downloadAudioButton: document.getElementById('downloadAudioButton'),
+    
+    // Ajuda
     helpButton: document.getElementById('helpButton'),
     helpModal: document.getElementById('helpModal'),
     closeButton: document.querySelector('.help-close-button')
 };
 
-// Inicialização
+// =============================================
+// FUNÇÕES DE INICIALIZAÇÃO
+// =============================================
+
+// =============================================
+// FUNÇÕES DE DRAG AND DROP E PASTE
+// =============================================
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    unhighlightArea.call(e.currentTarget);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleDroppedFile(files[0]);
+    }
+}
+
+function handleDroppedFile(file) {
+    if (file.type.startsWith('image/')) {
+        uploadedFile = file;
+        uploadedPdf = null;
+        uploadedAudio = null;
+        showImagePreview(file);
+    } else if (file.type === 'application/pdf') {
+        uploadedPdf = file;
+        uploadedFile = null;
+        uploadedAudio = null;
+        showPdfPreview(file);
+    } else if (file.type.startsWith('audio/')) {
+        uploadedAudio = file;
+        uploadedFile = null;
+        uploadedPdf = null;
+        showAudioPreview(file);
+    } else {
+        showAlert('Tipo de arquivo não suportado. Por favor, use imagens, PDFs ou arquivos de áudio.');
+    }
+}
+
+function handlePaste(e) {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            const blob = items[i].getAsFile();
+            if (blob) {
+                uploadedFile = blob;
+                uploadedPdf = null;
+                uploadedAudio = null;
+                showImagePreview(blob);
+                break;
+            }
+        }
+    }
+}
+
+function showImagePreview(file) {
+    togglePreview('image');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        elements.imagePreview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function showPdfPreview(file) {
+    togglePreview('pdf');
+    const blobUrl = URL.createObjectURL(file);
+    elements.pdfPreview.src = blobUrl;
+}
+
+function showAudioPreview(file) {
+    togglePreview('audio');
+    const blobUrl = URL.createObjectURL(file);
+    elements.audioPreview.src = blobUrl;
+    
+    // Atualiza informações do arquivo
+    elements.audioFileName.querySelector('span').textContent = file.name;
+    elements.audioFileSize.querySelector('span').textContent = formatFileSize(file.size);
+    
+    // Carrega metadados para obter a duração
+    elements.audioPreview.onloadedmetadata = () => {
+        elements.audioDuration.querySelector('span').textContent = formatTime(elements.audioPreview.duration);
+    };
+}
+
+// =============================================
+// CONFIGURAÇÃO DE EVENT LISTENERS
+// =============================================
+
+function setupEventListeners() {
+    // ... outros listeners ...
+    
+    // Configura drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        elements.dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        elements.dropArea.addEventListener(eventName, highlightArea, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        elements.dropArea.addEventListener(eventName, unhighlightArea, false);
+    });
+    
+    elements.dropArea.addEventListener('drop', handleDrop, false);
+    
+    // Configura paste
+    document.addEventListener('paste', handlePaste);
+    
+    // Garante que a área de paste seja clicável para focar no documento
+    elements.pasteArea.addEventListener('click', () => {
+        document.activeElement.blur();
+        document.body.focus();
+    });
+}
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function highlightArea() {
+    this.classList.add('dragover');
+}
+
+function unhighlightArea() {
+    this.classList.remove('dragover');
+}
+
 function init() {
     setupEventListeners();
 }
 
-// Configuração de event listeners
 function setupEventListeners() {
     // Upload de arquivos
     elements.imageInput.addEventListener('change', handleImageUpload);
     elements.pdfInput.addEventListener('change', handlePdfUpload);
+    elements.audioInput.addEventListener('change', handleAudioUpload);
     
-    // Botões principais
+    // Botões de ação
     elements.cleanPdfButton.addEventListener('click', cleanAndDownloadPdf);
     elements.extractButton.addEventListener('click', extractText);
     elements.copyButton.addEventListener('click', copyText);
     elements.toggleDetailsButton.addEventListener('click', toggleDetails);
+    elements.convertButton.addEventListener('click', convertToMp3);
+    elements.downloadAudioButton.addEventListener('click', downloadMp3);
     
     // Drag and drop
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    setupDragAndDropListeners();
+    
+    // Modal de ajuda
+    setupHelpModalListeners();
+}
+
+function setupDragAndDropListeners() {
+    const events = ['dragenter', 'dragover', 'dragleave', 'drop'];
+    
+    events.forEach(eventName => {
         elements.dropArea.addEventListener(eventName, preventDefaults, false);
         elements.pasteArea.addEventListener(eventName, preventDefaults, false);
     });
@@ -66,8 +242,9 @@ function setupEventListeners() {
     
     elements.dropArea.addEventListener('drop', handleDrop, false);
     document.addEventListener('paste', handlePaste);
-    
-    // Ajuda
+}
+
+function setupHelpModalListeners() {
     elements.helpButton.addEventListener('click', () => {
         elements.helpModal.style.display = 'block';
     });
@@ -83,10 +260,15 @@ function setupEventListeners() {
     });
 }
 
-// Funções de manipulação de arquivos
+// =============================================
+// FUNÇÕES DE MANIPULAÇÃO DE ARQUIVOS
+// =============================================
+
+// Funções de upload
 async function handleImageUpload(event) {
     uploadedFile = event.target.files[0];
     uploadedPdf = null;
+    uploadedAudio = null;
     
     if (uploadedFile) {
         togglePreview('image');
@@ -102,6 +284,7 @@ async function handleImageUpload(event) {
 async function handlePdfUpload(event) {
     uploadedPdf = event.target.files[0];
     uploadedFile = null;
+    uploadedAudio = null;
     
     if (uploadedPdf) {
         togglePreview('pdf');
@@ -110,12 +293,52 @@ async function handlePdfUpload(event) {
     }
 }
 
+async function handleAudioUpload(event) {
+    uploadedAudio = event.target.files[0];
+    uploadedFile = null;
+    uploadedPdf = null;
+    
+    if (uploadedAudio) {
+        togglePreview('audio');
+        const blobUrl = URL.createObjectURL(uploadedAudio);
+        elements.audioPreview.src = blobUrl;
+        
+        elements.audioFileName.textContent = `Nome: ${uploadedAudio.name}`;
+        elements.audioFileSize.textContent = `Tamanho: ${formatFileSize(uploadedAudio.size)}`;
+        
+        elements.audioPreview.onloadedmetadata = () => {
+            elements.audioDuration.textContent = `Duração: ${formatTime(elements.audioPreview.duration)}`;
+        };
+    }
+}
+
+// Funções de visualização
 function togglePreview(type) {
     elements.pdfPreviewContainer.classList.toggle('hidden', type !== 'pdf');
     elements.imagePreviewContainer.classList.toggle('hidden', type !== 'image');
+    elements.audioPreviewContainer.classList.toggle('hidden', type !== 'audio');
+    document.getElementById('playConverted').classList.toggle('hidden', type !== 'audio');
 }
 
-// Funções de PDF
+// Funções de formatação
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+// =============================================
+// FUNÇÕES DE PROCESSAMENTO DE PDF
+// =============================================
+
 async function cleanAndDownloadPdf() {
     if (!uploadedPdf) {
         showAlert('Por favor, carregue um PDF primeiro.');
@@ -235,7 +458,7 @@ async function renderCleanPdf(pdfFile) {
     return await newPdfDoc.save();
 }
 
-// Funções de utilidade
+// Funções auxiliares de PDF
 function downloadPdf(pdfBytes) {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const fileName = `documento_limpo_${elements.cleanMode.value}.pdf`;
@@ -252,80 +475,104 @@ function updateProgress(percent) {
     elements.pdfProgress.textContent = `${percent}%`;
 }
 
-function readFileAsArrayBuffer(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(file);
-    });
-}
+// =============================================
+// FUNÇÕES DE CONVERSÃO DE ÁUDIO
+// =============================================
 
-// Funções de drag and drop
-function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function highlightArea() {
-    this.classList.add('dragover');
-}
-
-function unhighlightArea() {
-    this.classList.remove('dragover');
-}
-
-function handleDrop(e) {
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    
-    if (file.type.startsWith('image/')) {
-        handleDroppedFile(file, 'image');
-    } else if (file.type === 'application/pdf') {
-        handleDroppedFile(file, 'pdf');
+async function convertToMp3() {
+    if (!uploadedAudio) {
+        showAlert('Por favor, carregue um arquivo de áudio primeiro.');
+        return;
     }
-}
 
-function handleDroppedFile(file, type) {
-    if (type === 'image') {
-        uploadedFile = file;
-        uploadedPdf = null;
-    } else {
-        uploadedPdf = file;
-        uploadedFile = null;
-    }
-    
-    togglePreview(type);
-    
-    if (type === 'image') {
-        const reader = new FileReader();
-        reader.onload = (e) => elements.imagePreview.src = e.target.result;
-        reader.readAsDataURL(file);
-    } else {
-        elements.pdfPreview.src = URL.createObjectURL(file);
-    }
-}
-
-function handlePaste(e) {
-    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-    
-    for (const item of items) {
-        if (item.type.indexOf('image') !== -1) {
-            const blob = item.getAsFile();
-            uploadedFile = blob;
-            uploadedPdf = null;
-            
-            togglePreview('image');
-            
-            const reader = new FileReader();
-            reader.onload = (event) => elements.imagePreview.src = event.target.result;
-            reader.readAsDataURL(blob);
-            break;
+    try {
+        showAlert('Convertendo para MP3...');
+        
+        if (!window.lamejs) {
+            throw new Error('Biblioteca de codificação MP3 não carregada');
         }
+        
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        
+        const arrayBuffer = await uploadedAudio.arrayBuffer();
+        let audioBuffer;
+        
+        try {
+            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        } catch (e) {
+            throw new Error('Formato de áudio não suportado ou arquivo corrompido');
+        }
+        
+        const bitrate = parseInt(document.getElementById('bitrate').value) || 128;
+        const sampleRate = Math.min(44100, audioBuffer.sampleRate);
+        const channels = audioBuffer.numberOfChannels;
+        
+        const mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, bitrate);
+        
+        const leftChannel = audioBuffer.getChannelData(0);
+        const rightChannel = channels > 1 ? audioBuffer.getChannelData(1) : leftChannel;
+        
+        const samples = new Int16Array(leftChannel.length * channels);
+        for (let i = 0, j = 0; i < leftChannel.length; i++) {
+            samples[j++] = leftChannel[i] * 32767;
+            if (channels > 1) {
+                samples[j++] = rightChannel[i] * 32767;
+            }
+        }
+        
+        const chunkSize = 1152;
+        const mp3Data = [];
+        
+        for (let i = 0; i < samples.length; i += chunkSize * channels) {
+            const chunk = samples.subarray(i, i + chunkSize * channels);
+            const mp3buf = mp3Encoder.encodeBuffer(chunk);
+            if (mp3buf.length > 0) {
+                mp3Data.push(mp3buf);
+            }
+        }
+        
+        const finalMP3 = mp3Encoder.flush();
+        if (finalMP3.length > 0) {
+            mp3Data.push(finalMP3);
+        }
+        
+        audioBlob = new Blob(mp3Data, { type: 'audio/mp3' });
+        const audioURL = URL.createObjectURL(audioBlob);
+        elements.convertedAudio.src = audioURL;
+        
+        elements.convertedAudio.oncanplaythrough = () => {
+            document.getElementById('playConverted').onclick = () => {
+                elements.convertedAudio.play().catch(e => {
+                    console.error("Erro ao reproduzir:", e);
+                    showAlert("Erro ao reproduzir. Clique novamente para tentar.");
+                });
+            };
+        };
+        
+        elements.audioResultContainer.classList.remove('hidden');
+        showAlert('Conversão concluída com sucesso! Clique no botão "Reproduzir" para ouvir.');
+        
+    } catch (error) {
+        handleError('Erro ao converter áudio:', error);
+        showAlert(`Falha na conversão: ${error.message}`);
     }
 }
 
-// Funções de extração de texto
+function downloadMp3() {
+    if (!audioBlob) {
+        showAlert('Nenhum arquivo MP3 disponível para download.');
+        return;
+    }
+    
+    const fileName = uploadedAudio.name.replace(/\.[^/.]+$/, "") + '.mp3';
+    saveAs(audioBlob, fileName);
+}
+
+// =============================================
+// FUNÇÕES DE EXTRAÇÃO DE TEXTO
+// =============================================
+
 function extractText() {
     if (!uploadedFile && !uploadedPdf) {
         showAlert('Por favor, carregue uma imagem ou PDF.');
@@ -369,7 +616,35 @@ function handleRecognitionError(err) {
     elements.output.innerText = 'Erro ao processar a imagem.';
 }
 
-// Funções auxiliares
+// =============================================
+// FUNÇÕES AUXILIARES
+// =============================================
+
+// Funções de manipulação de arquivos
+function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function mergeArrays(arrays) {
+    let totalLength = 0;
+    for (const arr of arrays) {
+        totalLength += arr.length;
+    }
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const arr of arrays) {
+        result.set(arr, offset);
+        offset += arr.length;
+    }
+    return result;
+}
+
+// Funções de UI
 function copyText() {
     navigator.clipboard.writeText(elements.output.innerText)
         .then(() => showAlert('Texto copiado para a área de transferência!'))
@@ -391,5 +666,8 @@ function handleError(context, error) {
     showAlert(`Erro: ${error.message}`);
 }
 
-// Inicializar a aplicação
+// =============================================
+// INICIALIZAÇÃO DA APLICAÇÃO
+// =============================================
+
 init();
