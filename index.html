@@ -3,31 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucas Araujo Ramos - Conversor de Imagem em Texto</title>
+    <title>Lucas Araujo Ramos - Conversor Multifuncional</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <!-- Botão de Ajuda -->
-        <button id="helpButton" class="help-button">?</button>
+        <!-- ==================== -->
+        <!-- HELP BUTTON (FLOATING) -->
+        <!-- ==================== -->
+        <button id="helpButton" class="help-button" aria-label="Ajuda">?</button>
 
-        <!-- Cabeçalho -->
+        <!-- ==================== -->
+        <!-- HEADER SECTION -->
+        <!-- ==================== -->
         <header class="header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" class="logo">
             </div>
-            <h1>Conversor de Imagem em Texto <br> Limpeza de PDF</h1>
+            <h1>Conversor Multifuncional</h1>
+            <h2>Imagem para Texto • Limpeza de PDF • Conversor de Áudio</h2>
         </header>
 
-        <!-- Seção de Upload -->
+        <!-- ==================== -->
+        <!-- UPLOAD SECTION -->
+        <!-- ==================== -->
         <section class="upload-section">
             <div class="upload-buttons">
-                <input type="file" id="imageInput" accept="image/*" class="visually-hidden">
-                <label for="imageInput" class="upload-label">Carregar Imagem</label>
+                <!-- Image Upload -->
+                <div class="upload-group">
+                    <input type="file" id="imageInput" accept="image/*" class="visually-hidden">
+                    <label for="imageInput" class="upload-label">
+                        <span class="icon">🖼️</span> Carregar Imagem
+                    </label>
+                </div>
                 
-                <input type="file" id="pdfInput" accept="application/pdf" class="visually-hidden">
-                <label for="pdfInput" class="upload-label pdf-button">Carregar PDF</label>
+                <!-- PDF Upload -->
+                <div class="upload-group">
+                    <input type="file" id="pdfInput" accept="application/pdf" class="visually-hidden">
+                    <label for="pdfInput" class="upload-label pdf-button">
+                        <span class="icon">📄</span> Carregar PDF
+                    </label>
+                </div>
+
+                <!-- Audio Upload -->
+                <div class="upload-group">
+                    <input type="file" id="audioInput" accept="audio/*" class="visually-hidden">
+                    <label for="audioInput" class="upload-label audio-button">
+                        <span class="icon">🎵</span> Carregar Áudio
+                    </label>
+                </div>
                 
+                <!-- PDF Processing Indicator -->
                 <div id="pdfProcessingMessage" class="hidden processing-message">
                     <div class="progress-bar">
                         <div id="pdfProgress" class="progress-bar-fill">0%</div>
@@ -36,104 +62,216 @@
                 </div>
             </div>
 
+            <!-- Drag & Drop Area -->
             <div id="dropArea" class="drop-area">
-                <p>Arraste e solte uma imagem aqui ou PDF</p>
+                <p>Arraste e solte arquivos aqui</p>
+                <p class="small">(Imagens, PDFs ou Áudios)</p>
             </div>
             
+            <!-- Paste Area -->
             <div id="pasteArea" class="paste-area">
                 <p>Ou cole uma imagem (Ctrl + V)</p>
             </div>
         </section>
 
-        <!-- Visualização -->
+        <!-- ==================== -->
+        <!-- PREVIEW SECTION -->
+        <!-- ==================== -->
         <section class="preview-section">
+            <!-- Image Preview -->
             <div id="imagePreviewContainer" class="preview-container hidden">
-                <h3>Pré-visualização:</h3>
-                <img id="imagePreview" src="#" alt="Pré-visualização da imagem">
+                <h3>Pré-visualização da Imagem:</h3>
+                <img id="imagePreview" src="#" alt="Pré-visualização da imagem" class="preview-content">
             </div>
             
+            <!-- Audio Preview -->
+            <div id="audioPreviewContainer" class="preview-container hidden">
+                <h3>Pré-visualização do Áudio:</h3>
+                <audio id="audioPreview" controls class="preview-content"></audio>
+                <div class="audio-info">
+                    <p id="audioFileName"><strong>Nome:</strong> <span></span></p>
+                    <p id="audioFileSize"><strong>Tamanho:</strong> <span></span></p>
+                    <p id="audioDuration"><strong>Duração:</strong> <span></span></p>
+                </div>
+            </div>
+
+            <!-- PDF Preview -->
             <div id="pdfPreviewContainer" class="preview-container hidden">
                 <h3>Visualização do PDF:</h3>
-                <iframe id="pdfPreview" frameborder="0"></iframe>
+                <iframe id="pdfPreview" frameborder="0" class="preview-content"></iframe>
             </div>
         </section>
 
-        <!-- Configurações -->
+        <!-- ==================== -->
+        <!-- SETTINGS SECTION -->
+        <!-- ==================== -->
         <section class="settings">
-            <div class="language-selector">
-                <label for="language">Idioma:</label>
+            <!-- Language Settings -->
+            <div class="setting-group">
+                <label for="language">Idioma para OCR:</label>
                 <select id="language">
                     <option value="por">Português</option>
                     <option value="eng">Inglês</option>
                     <option value="spa">Espanhol</option>
                     <option value="fra">Francês</option>
+                    <option value="deu">Alemão</option>
+                    <option value="ita">Italiano</option>
                 </select>
             </div>
 
-            <div class="clean-options">
-                <label for="cleanMode">Modo de Limpeza:</label>
+            <!-- PDF Cleaning Options -->
+            <div class="setting-group">
+                <label for="cleanMode">Modo de Limpeza de PDF:</label>
                 <select id="cleanMode">
                     <option value="render">Avançado (Limpeza para Tarjamento)</option>
+                    <option value="basic">Básico (Remoção de Metadados)</option>
+                    <option value="deep">Profundo (Remoção de Formulários)</option>
+                </select>
+            </div>
+
+            <!-- Audio Quality Settings -->
+            <div class="setting-group audio-quality hidden">
+                <label for="bitrate">Qualidade do MP3:</label>
+                <select id="bitrate">
+                    <option value="96">96 kbps (baixa)</option>
+                    <option value="128" selected>128 kbps (média)</option>
+                    <option value="192">192 kbps (alta)</option>
+                    <option value="320">320 kbps (máxima)</option>
                 </select>
             </div>
         </section>
 
-        <!-- Ações -->
+        <!-- ==================== -->
+        <!-- ACTION BUTTONS -->
+        <!-- ==================== -->
         <section class="actions">
-            <button id="cleanPdfButton" class="btn-clean">Limpar e Baixar PDF</button>
-            <button id="extractButton" class="btn-extract">Extrair Texto</button>
+            <button id="cleanPdfButton" class="btn-action btn-clean">
+                <span class="icon">🧹</span> Limpar e Baixar PDF
+            </button>
+            <button id="extractButton" class="btn-action btn-extract">
+                <span class="icon">🔍</span> Extrair Texto
+            </button>
+            <button id="convertButton" class="btn-action btn-convert">
+                <span class="icon">🔄</span> Converter para MP3
+            </button>
         </section>
 
-        <!-- Resultados -->
+        <!-- ==================== -->
+        <!-- RESULTS SECTION -->
+        <!-- ==================== -->
         <section class="results">
-            <h2>Texto Extraído:</h2>
-            <div class="text-container">
-                <pre id="output"></pre>
-                <button id="copyButton" class="btn-copy hidden">Copiar Texto</button>
+            <!-- Text Extraction Results -->
+            <div class="result-group">
+                <h2>Texto Extraído:</h2>
+                <div class="text-container">
+                    <pre id="output">O texto extraído aparecerá aqui...</pre>
+                    <button id="copyButton" class="btn-action btn-copy hidden">
+                        <span class="icon">📋</span> Copiar Texto
+                    </button>
+                </div>
+                <button id="toggleDetailsButton" class="btn-action btn-details hidden">
+                    <span class="icon">🔎</span> Mostrar Detalhes
+                </button>
+                <div id="confidenceDetails" class="hidden"></div>
             </div>
-            <button id="toggleDetailsButton" class="btn-details hidden">Mostrar Detalhes</button>
-            <div id="confidenceDetails" class="hidden"></div>
+
+            <!-- Audio Conversion Results -->
+            <div id="audioResultContainer" class="result-group hidden">
+                <h2>Áudio Convertido:</h2>
+                <div class="audio-result">
+                    <audio id="convertedAudio" controls></audio>
+                    <button id="playConverted" class="btn-action btn-play hidden">
+                        <span class="icon">▶️</span> Reproduzir
+                    </button>
+                    <button id="downloadAudioButton" class="btn-action btn-download">
+                        <span class="icon">💾</span> Baixar MP3
+                    </button>
+                </div>
+            </div>
         </section>
     </div>
 
-    <!-- Modal de Ajuda -->
+    <!-- ==================== -->
+    <!-- HELP MODAL -->
+    <!-- ==================== -->
     <div id="helpModal" class="help-modal">
         <div class="help-modal-content">
             <span class="help-close-button">&times;</span>
-            <h2>Ajuda - Conversor de Imagem em Texto <br> Limpeza Para Tarjamento</h2>
+            <h2>Ajuda - Conversor Multifuncional</h2>
             <div class="help-content">
-                <h3>Como usar:</h3>
-                <ol>
-                    <li><strong>Carregar Imagem/PDF:</strong> Use os botões ou arraste e solte o arquivo na área indicada.</li>
-                    <li><strong>Configurações:</strong> Selecione o idioma do texto na imagem caso necessario e o modo de limpeza (para PDFs).</li>
-                    <li><strong>Ações:</strong>
-                        <ul>
-                            <li>"Limpar e Baixar PDF" - Remove metadados e otimiza o PDF Para tarjamento sem Bug</li>
-                            <li>"Extrair Texto" - Converte o texto da imagem em texto editável podendo copiar</li>
-                        </ul>
-                    </li>
-                    <li><strong>Resultados:</strong> O texto extraído aparecerá na área abaixo, com opção de copiar.</li>
-                </ol>
-                
-                <h3>Recursos:</h3>
-                <ul>
-                    <li>Suporte a múltiplos idiomas</li>
-                    <li>Pré-visualização de imagens e PDFs</li>
-                    <li>Opção de colar imagem diretamente (Ctrl+V)</li>
-                    <li>Detalhes de confiança na extração de texto</li>
-                </ul>
-                
-                <h3>Formatos suportados:</h3>
-                <p>Imagens: JPG, PNG, BMP | Documentos: PDF</p>
+                <div class="help-section">
+                    <h3>📷 Conversão de Imagem para Texto</h3>
+                    <ol>
+                        <li><strong>Carregue uma imagem</strong> usando o botão ou arrastando</li>
+                        <li><strong>Selecione o idioma</strong> do texto na imagem</li>
+                        <li><strong>Clique em "Extrair Texto"</strong> para converter</li>
+                        <li><strong>Copie o resultado</strong> com o botão fornecido</li>
+                    </ol>
+                </div>
+
+                <div class="help-section">
+                    <h3>📄 Limpeza de PDF</h3>
+                    <ol>
+                        <li><strong>Carregue um PDF</strong> usando o botão correspondente</li>
+                        <li><strong>Escolha o modo de limpeza</strong>:
+                            <ul>
+                                <li><strong>Avançado</strong> - Ideal para tarjamento</li>
+                                <li><strong>Básico</strong> - Remove apenas metadados</li>
+                            </ul>
+                        </li>
+                        <li><strong>Clique em "Limpar e Baixar"</strong> para processar</li>
+                    </ol>
+                </div>
+
+                <div class="help-section">
+                    <h3>🎵 Conversão de Áudio</h3>
+                    <ol>
+                        <li><strong>Carregue um arquivo de áudio</strong> (MP3, WAV, etc.)</li>
+                        <li><strong>Selecione a qualidade</strong> desejada para o MP3</li>
+                        <li><strong>Clique em "Converter para MP3"</strong></li>
+                        <li><strong>Reproduza ou baixe</strong> o resultado</li>
+                    </ol>
+                </div>
+
+                <div class="help-section">
+                    <h3>📌 Dicas e Informações</h3>
+                    <ul>
+                        <li>Você pode <strong>colar imagens diretamente</strong> (Ctrl+V)</li>
+                        <li>Arquivos grandes podem demorar mais para processar</li>
+                        <li>Para melhores resultados no OCR, use imagens nítidas</li>
+                        <li>A qualidade do áudio afeta o tamanho do arquivo final</li>
+                    </ul>
+                </div>
+
+                <div class="supported-formats">
+                    <h3>🔄 Formatos Suportados</h3>
+                    <div class="formats-grid">
+                        <div>
+                            <h4>Imagens:</h4>
+                            <p>JPG, PNG, BMP, TIFF</p>
+                        </div>
+                        <div>
+                            <h4>Documentos:</h4>
+                            <p>PDF</p>
+                        </div>
+                        <div>
+                            <h4>Áudio:</h4>
+                            <p>MP3, WAV, OGG, AAC, FLAC</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Bibliotecas JavaScript -->
+    <!-- ==================== -->
+    <!-- JAVASCRIPT LIBRARIES -->
+    <!-- ==================== -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
