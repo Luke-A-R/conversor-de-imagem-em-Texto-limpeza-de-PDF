@@ -434,29 +434,43 @@ async function renderCleanPdf(pdfFile) {
     const pdf = await loadingTask.promise;
     const { PDFDocument } = PDFLib;
     const newPdfDoc = await PDFDocument.create();
-    
+
+    const dpi = 300;                      // Define a qualidade (300 DPI é bom para impressão)
+    const scale = dpi / 72;              // 72 é o padrão base do PDF.js
+
     for (let i = 1; i <= pdf.numPages; i++) {
         updateProgress(30 + (i * 50 / pdf.numPages));
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.0 });
-        
+        const viewport = page.getViewport({ scale });
+
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
         canvas.width = viewport.width;
-        
+        canvas.height = viewport.height;
+
         await page.render({ canvasContext: context, viewport }).promise;
-        
-        const image = await newPdfDoc.embedPng(canvas.toDataURL('image/png'));
+
+        // Usa Blob para melhor qualidade do PNG
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const arrayBuffer = await blob.arrayBuffer();
+
+        const image = await newPdfDoc.embedPng(arrayBuffer);
         const newPage = newPdfDoc.addPage([image.width, image.height]);
-        newPage.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+
+        newPage.drawImage(image, {
+            x: 0,
+            y: 0,
+            width: image.width,
+            height: image.height
+        });
     }
-    
+
     newPdfDoc.setTitle('Documento Renderizado');
     newPdfDoc.setAuthor('');
-    
+
     return await newPdfDoc.save();
 }
+
 
 // Funções auxiliares de PDF
 function downloadPdf(pdfBytes) {
