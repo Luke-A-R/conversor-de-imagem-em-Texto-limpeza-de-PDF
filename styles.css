@@ -3,16 +3,16 @@
 /* ============================================= */
 :root {
   /* Cores principais */
-  --primary-color: #007bff;
+  --primary-color: #0056b3;
   --primary-hover: #0056b3;
-  --secondary-color: #ff5722;
-  --secondary-hover: #e64a19;
-  --success-color: #28a745;
-  --success-hover: #218838;
-  --audio-color: #9c27b0;
-  --audio-hover: #7b1fa2;
-  --download-color: #2196f3;
-  --download-hover: #1976d2;
+  --secondary-color: #0056b3;
+  --secondary-hover: #0056b3;
+  --success-color: #0056b3;
+  --success-hover: #0056b3;
+  --audio-color: #0056b3;
+  --audio-hover: #0056b3;
+  --download-color: #0056b3;
+  --download-hover: #0056b3;
   --gray-color: #6c757d;
   --gray-hover: #5a6268;
   --light-gray: #f4f4f9;
